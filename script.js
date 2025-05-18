@@ -1,4 +1,3 @@
-// Register service worker for PWA
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/service-worker.js")
@@ -10,20 +9,24 @@ if ("serviceWorker" in navigator) {
     });
 }
 
-function openUrls() {
-  const urls = document.getElementById('urls').value.trim();
-  
-  // Split the input by newlines, commas, or semicolons and remove extra spaces
-  const urlList = urls.split(/\s*[\n\r,;]\s*/).filter(function (url) {
-      return url.trim().length > 0; // Filter out empty or invalid URLs
-  });
-
-  // Open each URL in a new tab without delay
-  urlList.forEach(url => {
-      if (url) {
-          const formattedUrl = url.startsWith('http') ? url : 'https://' + url;
-          window.open(formattedUrl, '_blank'); // Open each URL in a new tab
-      }
-  });
+function extractUrls(text) {
+  const urlRegex = /\b(?:https?:\/\/)?(?:www\.)?[a-z0-9.-]+\.[a-z]{2,}(?:\/[^\s]*)?/gi;
+  const matches = text.match(urlRegex);
+  return matches || [];
 }
 
+function openUrls() {
+  const text = document.getElementById('urls').value.trim();
+
+  const urlList = extractUrls(text);
+
+  if (urlList.length === 0) {
+    alert("No URLs found.");
+    return;
+  }
+
+  urlList.forEach(url => {
+    const formattedUrl = url.startsWith('http') ? url : 'https://' + url;
+    window.open(formattedUrl, '_blank');
+  });
+}
